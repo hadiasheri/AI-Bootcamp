@@ -40,13 +40,13 @@ running = True
 
 while running:
     msg = """
-    1. Add Contact
-    2. Get Phone
-    3. Exit
+    A. Add Contact
+    G. Get Phone
+    E. Exit
 """
     try:
         c = input(msg)
-        if c == "1":
+        if c == "A":
             u = input("enter user: ").strip()
 
             if u in phone_book:
@@ -67,17 +67,17 @@ while running:
             add_contact_to_file(u, phone)
             print(f"Contact '{u}' added successfully.")
 
-        elif c == "2":
+        elif c == "G":
             u = input("Enter user name to search: ").strip()
             if u in phone_book:
                 print(f"Contact '{u}' -> Phone: {phone_book[u]}")
             else:
                 print(f"Contact '{u}' not found.")
 
-        elif c == "3":
+        elif c == "E":
             print("Exiting phonebook. Goodbye!")
             running = False
         else:
-            print("Invalid option. Please enter 1, 2, or 3.")
+            print("Invalid option. Please enter A, G, or E.")
     except Exception as e:
         print(f"An unexpected error happened: {e}")
