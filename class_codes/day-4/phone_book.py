@@ -26,6 +26,7 @@ def read_file_contacts():
 
 
 def add_contact_to_file(user, phone):
+    user = user.strip().lower()
     if not os.path.exists(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
     with open(path, "a", encoding="utf-8") as file:
@@ -45,8 +46,8 @@ while running:
     E. Exit
 """
     try:
-        c = input(msg)
-        if c == "A":
+        c = input(msg).upper()
+        if c in ["A", "ADD", "A. ADD CONTACT", "ADD CONTACT"]:
             u = input("enter user: ").strip()
 
             if u in phone_book:
@@ -67,17 +68,17 @@ while running:
             add_contact_to_file(u, phone)
             print(f"Contact '{u}' added successfully.")
 
-        elif c == "G":
+        elif c in ["G", "GET", "G. GET PHONE", "GET PHONE"]:
             u = input("Enter user name to search: ").strip()
-            if u in phone_book:
+            if u.lower() in phone_book:
                 print(f"Contact '{u}' -> Phone: {phone_book[u]}")
             else:
                 print(f"Contact '{u}' not found.")
 
-        elif c == "E":
+        elif c in ["E", "EXIT", "E. EXIT"]:
             print("Exiting phonebook. Goodbye!")
             running = False
         else:
-            print("Invalid option. Please enter A, G, or E.")
+            print("Invalid option. Please enter valid choices like A, G, or E.")
     except Exception as e:
         print(f"An unexpected error happened: {e}")
