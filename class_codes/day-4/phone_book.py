@@ -7,24 +7,24 @@ if not os.path.exists("data"):
     os.makedirs("data")
 if not os.path.exists(path):
     with open(path, "w", encoding="utf-8") as file:
-        json.dump({}, file)
+        json.dump([], file)
 
 
-def read_file_contacts() -> dict[str, str]:
+def read_file_contacts() -> list:
     try:
         if not os.path.exists(path):
-            return {}
-        with open(path, "r") as file:
+            return []
+        with open(path, "r", encoding="utf-8") as file:
             return json.load(file)
     except json.JSONDecodeError:
         print("JSON database is corrupted. So, a new one is created.")
-        return {}
+        return []
     except Exception as e:
         print(f"Exception occured: {e}. So, a new one is created.")
-        return {}
+        return []
 
 
-def save_contacts(data: dict[str, str]):
+def save_contacts(data: list):
     try:
         with open(path, "w", encoding="utf-8") as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
@@ -38,43 +38,51 @@ running = True
 while running:
     msg = """
     A. Add Contact
-    G. Get Phone
+    G. Get Contact
     E. Exit
 """
     try:
         c = input(msg).upper()
+
         if c in ["A", "ADD", "A. ADD CONTACT", "ADD CONTACT"]:
             u = input("enter user: ").strip()
 
-            if u in phone_book:
+            if any(contact["name"].lower() == u.lower() for contact in phone_book):
                 print(f"Error: User '{u}' already exists!")
                 continue
 
-            phone = input("enter phone: ").strip()
+            work = input("enter work: ").strip()
+            email = input("enter email: ").strip()
+            mobile = input("enter mobile: ").strip()
 
-            if "--" in u or "--" in phone:
-                print("Error: You cannot use '--' in username or phone number!")
+            if not u or not mobile:
+                print("Error: Name and Mobile cannot be empty!")
                 continue
 
-            if not u or not phone:
-                print("Error: Name and Phone cannot be empty!")
-                continue
+            phone_book.append(
+                {"name": u, "work": work, "email": email, "mobile": mobile}
+            )
 
-            phone_book[u] = phone
             save_contacts(phone_book)
             print(f"Contact '{u}' added successfully.")
 
-        elif c in ["G", "GET", "G. GET PHONE", "GET PHONE"]:
-            u = input("Enter user name to search: ").strip()
-            if u.lower() in phone_book:
-                print(f"Contact '{u}' -> Phone: {phone_book[u]}")
+        elif c in ["G", "GET", "G. GET PHONE", "GET PHONE", "GET CONTACT"]:
+            u = input("Enter user name to search: ").strip().lower()
+
+            contact = next(
+                (c for c in phone_book if c["name"].lower() == u.lower()), None
+            )
+
+            if contact:
+                print(f"Contact found: {contact}")
             else:
                 print(f"Contact '{u}' not found.")
-
         elif c in ["E", "EXIT", "E. EXIT"]:
             print("Exiting phonebook. Goodbye!")
             running = False
+
         else:
             print("Invalid option. Please enter valid choices like A, G, or E.")
+
     except Exception as e:
         print(f"An unexpected error happened: {e}")
