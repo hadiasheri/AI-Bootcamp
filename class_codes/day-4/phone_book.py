@@ -1,39 +1,35 @@
+import json
 import os
 
-path = "data/phonebook.txt"
+path = "data/phonebook.json"
+
+if not os.path.exists("data"):
+    os.makedirs("data")
+if not os.path.exists(path):
+    with open(path, "w", encoding="utf-8") as file:
+        json.dump({}, file)
 
 
-def read_file_contacts():
-    if not os.path.exists(path):
+def read_file_contacts() -> dict[str, str]:
+    try:
+        if not os.path.exists(path):
+            return {}
+        with open(path, "r") as file:
+            return json.load(file)
+    except json.JSONDecodeError:
+        print("JSON database is corrupted. So, a new one is created.")
         return {}
-    with open(path, "r") as file:
-        raw_file = file.read().strip()
-
-    if not raw_file:
+    except Exception as e:
+        print(f"Exception occured: {e}. So, a new one is created.")
         return {}
 
-    file_phones = {}
-    for line in raw_file.split("\n"):
-        if "--" not in line:
-            continue
 
-        u, phone = line.split("--")
-        u = u.strip()
-        phone = phone.strip()
-        file_phones[u] = phone
-
-    return file_phones
-
-
-def add_contact_to_file(user, phone):
-    user = user.strip().lower()
-    if not os.path.exists(os.path.dirname(path)):
-        os.makedirs(os.path.dirname(path))
-    with open(path, "a", encoding="utf-8") as file:
-        file.write(f"{user} -- {phone}\n")
-
-
-# ---
+def save_contacts(data: dict[str, str]):
+    try:
+        with open(path, "w", encoding="utf-8") as file:
+            json.dump(data, file, ensure_ascii=False, indent=4)
+    except Exception as e:
+        print(f"Exception occured while saving contacts: {e}.")
 
 
 phone_book = read_file_contacts()
@@ -65,7 +61,7 @@ while running:
                 continue
 
             phone_book[u] = phone
-            add_contact_to_file(u, phone)
+            save_contacts(phone_book)
             print(f"Contact '{u}' added successfully.")
 
         elif c in ["G", "GET", "G. GET PHONE", "GET PHONE"]:
