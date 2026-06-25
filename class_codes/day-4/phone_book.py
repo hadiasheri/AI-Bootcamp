@@ -1,25 +1,35 @@
+import os
 
 path = "data/phonebook.txt"
 
+
 def read_file_contacts():
-    with open(path,"r") as file:
+    if not os.path.exists(path):
+        return {}
+    with open(path, "r") as file:
         raw_file = file.read().strip()
+
+    if not raw_file:
+        return {}
 
     file_phones = {}
     for line in raw_file.split("\n"):
+        if "--" not in line:
+            continue
+
         u, phone = line.split("--")
         u = u.strip()
         phone = phone.strip()
         file_phones[u] = phone
-    
+
     return file_phones
 
-def add_contact_to_file(user,phone):
-    with open(path,"a") as file:
-        file.write(user)
-        file.write(" -- ")
-        file.write(phone)
-        file.write("\n")
+
+def add_contact_to_file(user, phone):
+    if not os.path.exists(os.path.dirname(path)):
+        os.makedirs(os.path.dirname(path))
+    with open(path, "a", encoding="utf-8") as file:
+        file.write(f"{user} -- {phone}\n")
 
 
 # ---
@@ -29,7 +39,6 @@ phone_book = read_file_contacts()
 running = True
 
 while running:
-
     msg = """
     1. add contact
     2. get phone
@@ -44,10 +53,10 @@ while running:
             # TODO: assert that user name and phone dose not have "--" in them
 
             phone_book[u] = phone
-            add_contact_to_file(u,phone)
+            add_contact_to_file(u, phone)
         elif c == "2":
             u = input("enter user: ")
-            print(u ,"phone:", phone_book[u])
+            print(u, "phone:", phone_book[u])
 
         elif c == "3":
             running = False
